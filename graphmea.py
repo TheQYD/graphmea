@@ -2,6 +2,7 @@
 
 import argparse
 import matplotlib.pyplot as plot
+import matplotlib.ticker as ticker
 import random
 
 COLORS = ['indigo', 'gold', 'hotpink', 'firebrick', 'indianred', 'yellow',
@@ -48,7 +49,11 @@ def RenderGraph(**args_dict):
   graph_data = args_dict.get('graph_data', [])
   graph_type = args_dict.get('graph_type')
   graph_output = args_dict.get('graph_output', 'mygraph-1')
+  graph_title = args_dict.get('graph_title')
   random_colors = args_dict.get('random_colors')
+  xlabel = args_dict.get('xlabel')
+  ylabel = args_dict.get('ylabel')
+  
   # Check for random colors
 
   if random_colors is True:
@@ -81,17 +86,21 @@ def Linegraph(graph_data, args_dict):
     plot.plot(x, y, lg_color, lw=2)
 
 def Bargraph(graph_data, args_dict):
-  graph_color = args_dict.get('graph_color', 'b')
   width = .7/len(graph_data)
-  
+  xticks = args_dict.get('xticks')
+  yticks = args_dict.get('yticks')
+  graph_len = max([len(i) for i in graph_data])
+  bar_pos = range(graph_len)
+  tick_pos = [i + width/graph_len for i in bar_pos]
+
   for gd in graph_data: 
-    xtick_label = xticks[graph_data.index(gd)]
     bg_color = COLORS[graph_data.index(gd)]
-    pos = range(0, len(gd))
-    plot.bar(pos, gd, width, color=bg_color, align='center')
-    plot.xticks(range(len(gd)), xtick_label, rotation='vertical')
+    plot.bar(bar_pos, gd, width, color=bg_color, align='center')
+    bar_pos = [i + width for i in bar_pos]
+    
+  if xticks is not None:
+    plot.xticks(tick_pos, xticks, rotation=45)
     #plot.yticks(range(len(gd)), gd)
-    pos = [i + width for i in pos]
 
 if __name__ == '__main__': 
   parser = argparse.ArgumentParser()
@@ -105,36 +114,31 @@ if __name__ == '__main__':
   parser.add_argument('--ymax', '-Y', action="store", type=int) 
   parser.add_argument('--xlabel', '-x', action="store", type=str) 
   parser.add_argument('--ylabel', '-y', action="store", type=str)
-  parser.add_argument('--xticks', action="append", type=str) 
+  parser.add_argument('--xticks', action="store", type=str) 
+  parser.add_argument('--yticks', action="store", type=str) 
   
   args = parser.parse_args()
-  graph_type = args.type
   graph_data = [map(int, i.split(',')) for i in args.data]
-  xticks = [i.split(',') for i in args.xticks]
-  graph_title = args.title 
-  xmax = args.xmax
-  ymax = args.ymax
-  xlabel = args.xlabel
-  ylabel = args.ylabel
-  graph_output = args.output 
   
-  try:
-    graph_color = [i.split(',') for i in args.color] 
-    graph_style = [i.split(',') for i in args.style] 
-  except:
-    graph_color = 'b'
-    graph_style = ''
+  if args.xticks is not None:
+    args.xticks = args.xticks.split(',')
+  if args.yticks is not None:
+    args.yticks = args.yticks.split(',')
+  if args.color is not None:
+    args.color = [i.split(',') for i in args.color] 
+  if args.style is not None:
+    args.style = [i.split(',') for i in args.style] 
   
   RenderGraph(
-    graph_type=graph_type,
+    graph_type=args.type,
     graph_data=graph_data,
-    graph_title=graph_title,
-    graph_output=graph_output,
-    graph_style=graph_style,
-    xmax=xmax,
-    ymax=ymax,
-    xlabel=xlabel,
-    ylabel=ylabel,
-    xticks=xticks,
-    graph_color=graph_color
+    graph_title=args.title,
+    graph_output=args.output,
+    graph_style=args.style,
+    xmax=args.xmax,
+    ymax=args.ymax,
+    xlabel=args.xlabel,
+    ylabel=args.ylabel,
+    xticks=args.xticks,
+    graph_color=args.color
   )
