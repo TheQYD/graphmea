@@ -3,35 +3,11 @@
 import argparse
 import matplotlib.pyplot as plot
 import matplotlib.ticker as ticker
-import matplotlib.lines as lines
+import matplotlib.patches as patches
 import random
+import matplotlib.colors as colors
 
-COLORS = ['indigo', 'gold', 'hotpink', 'firebrick', 'indianred', 'yellow',
-'mistyrose', 'darkolivegreen', 'olive', 'darkseagreen', 'pink', 'tomato',
-'lightcoral', 'orangered', 'navajowhite', 'lime', 'palegreen', 'greenyellow',
-'burlywood', 'seashell', 'mediumspringgreen', 'fuchsia', 'papayawhip',
-'blanchedalmond', 'chartreuse', 'dimgray', 'black', 'peachpuff', 'springgreen',
-'aquamarine', 'white', 'orange', 'lightsalmon', 'darkslategray', 'brown',
-'ivory', 'dodgerblue', 'peru', 'lawngreen', 'chocolate', 'crimson',
-'forestgreen', 'slateblue', 'lightseagreen', 'cyan', 'mintcream', 'silver',
-'antiquewhite', 'mediumorchid', 'skyblue', 'gray', 'darkturquoise',
-'goldenrod', 'darkgreen', 'floralwhite', 'darkviolet', 'darkgray', 'moccasin',
-'saddlebrown', 'darkslateblue', 'lightskyblue', 'lightpink', 'mediumvioletred',
-'red', 'deeppink', 'limegreen', 'darkmagenta', 'palegoldenrod', 'plum',
-'turquoise', 'lightgoldenrodyellow', 'darkgoldenrod', 'lavender', 'maroon',
-'yellowgreen', 'sandybrown', 'thistle', 'violet', 'navy', 'magenta', 'tan',
-'rosybrown', 'olivedrab', 'blue', 'lightblue', 'ghostwhite', 'honeydew',
-'cornflowerblue', 'linen', 'darkblue', 'powderblue', 'seagreen', 'darkkhaki',
-'snow', 'sienna', 'mediumblue', 'royalblue', 'lightcyan', 'green',
-'mediumpurple', 'midnightblue', 'cornsilk', 'paleturquoise', 'bisque',
-'slategray', 'darkcyan', 'khaki', 'wheat', 'teal', 'darkorchid', 'deepskyblue',
-'salmon', 'darkred', 'steelblue', 'palevioletred', 'lightslategray',
-'aliceblue', 'lightgreen', 'orchid', 'gainsboro', 'mediumseagreen',
-'lightgray', 'mediumturquoise', 'lemonchiffon', 'cadetblue', 'lightyellow',
-'lavenderblush', 'coral', 'purple', 'aqua', 'whitesmoke', 'mediumslateblue',
-'darkorange', 'mediumaquamarine', 'darksalmon', 'beige', 'blueviolet', 'azure',
-'lightsteelblue', 'oldlace']
-
+COLORS = colors.cnames.keys()
 
 def RenderGraph(**args_dict):
   """Draws a graph.
@@ -90,28 +66,38 @@ def Bargraph(graph_data, args_dict):
   width = .7/len(graph_data)
   xticks = args_dict.get('xticks')
   yticks = args_dict.get('yticks')
-  keys = args_dict.get('keys')
   graph_len = max([len(i) for i in graph_data])
   bar_pos = range(graph_len)
   tick_pos = [i + width/graph_len for i in bar_pos]
-  print keys
   
+  RenderLegend(args_dict)
 
   for gd in graph_data: 
     bg_color = COLORS[graph_data.index(gd)]
-    line = lines.Line2D(
-        [],
-        [],
-        color = bg_color,
-        label = keys[graph_data.index(gd)]
-    )
-    plot.legend(handles=[line])
+    
     plot.bar(bar_pos, gd, width, color=bg_color, align='center')
     bar_pos = [i + width for i in bar_pos]
 
   if xticks is not None:
     plot.xticks(tick_pos, xticks, rotation=45)
     #plot.yticks(range(len(gd)), gd)
+
+def RenderLegend(args_dict):
+  keys = args_dict.get('keys')
+  line_list = []
+  line_name = []
+
+  for key in keys:
+    line = patches.Patch(
+        [],
+        [],
+        color = COLORS[keys.index(key)],
+        label = keys[keys.index(key)]
+    )
+    line_list.append(line)
+    line_name.append(key)
+  
+  plot.legend(line_list, line_name)
 
 if __name__ == '__main__': 
   parser = argparse.ArgumentParser()
