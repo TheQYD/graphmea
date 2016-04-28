@@ -32,7 +32,8 @@ def RenderGraph(**args_dict):
   xlabel = args_dict.get('xlabel')
   ylabel = args_dict.get('ylabel')
   filename = args_dict.get('filename')
-
+  dpi = args_dict.get('dpi', 90)
+  
   # Check for random colors
 
   if random_colors is True:
@@ -51,10 +52,11 @@ def RenderGraph(**args_dict):
 
   # Plot the graph.
   #plot.axis([0, xmax, 0, ymax])
+  plot.tight_layout(pad=2)
   plot.xlabel(xlabel)
   plot.ylabel(ylabel)
   plot.title(graph_title[0])
-  plot.savefig(filename)
+  plot.savefig(filename, dpi=dpi)
   plot.show() 
 
 def Linegraph(graph_data, args_dict):
@@ -119,7 +121,7 @@ if __name__ == '__main__':
   parser.add_argument('--xticks', action="store", type=str) 
   parser.add_argument('--yticks', action="store", type=str) 
   parser.add_argument('--keys', '-k', action="store", type=str) 
-  parser.add_argument('--size', '-s', action="store", type=str) 
+  parser.add_argument('--dpi', '-D', action="store", type=str) 
 
   args = parser.parse_args()
   graph_data = [map(int, i.split(',')) for i in args.data]
@@ -134,6 +136,8 @@ if __name__ == '__main__':
     args.color = [i.split(',') for i in args.color] 
   if args.style is not None:
     args.style = [i.split(',') for i in args.style] 
+  if args.dpi is not None:
+    args.dpi = int(args.dpi)
 
   RenderGraph(
     graph_type=args.type,
@@ -149,5 +153,5 @@ if __name__ == '__main__':
     keys=args.keys,
     graph_color=args.color,
     filename=args.filename,
-    size=args.size
+    dpi=args.dpi
   )
