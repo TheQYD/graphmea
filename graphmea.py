@@ -5,6 +5,7 @@ import matplotlib.pyplot as plot
 import matplotlib.ticker as ticker
 import matplotlib.patches as patches
 import random
+import uuid
 import matplotlib.colors as colors
 
 COLORS = colors.cnames.keys()
@@ -30,12 +31,15 @@ def RenderGraph(**args_dict):
   random_colors = args_dict.get('random_colors')
   xlabel = args_dict.get('xlabel')
   ylabel = args_dict.get('ylabel')
- 
+  filename = args_dict.get('filename')
+
   # Check for random colors
 
   if random_colors is True:
     random.shuffle(COLORS)
- 
+  if filename is None:
+    filename = str(uuid.uuid4()) + '.png'
+
   # Call the function based on the first argument.
   eval(graph_type.capitalize())(graph_data, args_dict)
  
@@ -50,7 +54,7 @@ def RenderGraph(**args_dict):
   plot.xlabel(xlabel)
   plot.ylabel(ylabel)
   plot.title(graph_title[0])
-  plot.savefig('asdf'+ '.png')
+  plot.savefig(filename)
   plot.show() 
 
 def Linegraph(graph_data, args_dict):
@@ -104,6 +108,7 @@ if __name__ == '__main__':
   parser.add_argument('type', action='store', type=str) 
   parser.add_argument('--data', '-d', action="append", type=str)
   parser.add_argument('--title', '-t', action='append', type=str)
+  parser.add_argument('--filename', '-f', action='append', type=str)
   parser.add_argument('--output', '-o', action="store", type=str) 
   parser.add_argument('--color', '-c', action="store", type=str) 
   parser.add_argument('--style', '-s', action="store", type=str) 
@@ -114,6 +119,7 @@ if __name__ == '__main__':
   parser.add_argument('--xticks', action="store", type=str) 
   parser.add_argument('--yticks', action="store", type=str) 
   parser.add_argument('--keys', '-k', action="store", type=str) 
+  parser.add_argument('--size', '-s', action="store", type=str) 
 
   args = parser.parse_args()
   graph_data = [map(int, i.split(',')) for i in args.data]
@@ -141,5 +147,7 @@ if __name__ == '__main__':
     ylabel=args.ylabel,
     xticks=args.xticks,
     keys=args.keys,
-    graph_color=args.color
+    graph_color=args.color,
+    filename=args.filename,
+    size=args.size
   )
